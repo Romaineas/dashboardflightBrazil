@@ -1,0 +1,213 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1046{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\colortbl ;\red0\green176\blue80;}
+{\*\generator Riched20 10.0.16299}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang22 objetivos da an\'e1lise projeto FIGHTBRAZIL\par
+\par
+\fs28 1- pontualidade das companhias aereas\par
+\cf1\b avaliar a pontualidade das diferentes companhias. Medir a porcentagem de voos que decolaram e aterrissaram no hor\'e1rio previsto.\par
+\cf0\b0\fs22\par
+\fs28 2- An\'e1lise de atrasos\par
+\cf1\b Identifique padr\'f5es de atrasos nos voos. Anlise os principais motivos de atraso e as rotas mais afetadas.\cf0\b0\par
+\fs22\par
+\fs28 3- An\'e1lise de rotas Populares:\par
+\cf1\b identifique as rotas mais populares e quais companhias aereas dominam essas rotas.\par
+\cf0\b0\fs22\par
+\fs28 4- An\'e1lise de situa\'e7\'e3o de voos\par
+\cf1\b Explore a distribui\'e7\'e3o das diferentes situa\'e7\'f5es de voo, "Em Tempo", Atrasado, Cancelado.\par
+\cf0\b0\fs22\par
+\fs32 5- An\'e1lise de aerportos\par
+ \cf1\b\fs28 Avalie a efici\'eancia dos diferentes aeroportos em rela\'e7\'e3o \'e0 pontualidade, atrasos e cancelamentos.\par
+\par
+\cf0 Medidas:\par
+\cf1\par
+\cf0\b0 Taxa de Pontualidade: \par
+\cf1\b N\'famero de voos que decolaram ou aterrissaram no hor\'e1rio previsto em rela\'e7\'e3o ao n\'famero total de voos.\par
+\par
+\cf0\b0 Tempo M\'e9dio de Atraso: \par
+\cf1\b Calcula a m\'e9dia dos atrasos de todos os voos de partida real real x prevista.\par
+\par
+\cf0\b0 Taxa de Cancelamento:\par
+\b  \cf1 N\'famero de voos cancelados em rela\'e7\'e3o ao n\'famero total de voos.\par
+\par
+\cf0\b0 Rota Mais Atrasada:\par
+\b  \cf1 Identifica a rota com o maior tempo m\'e9dio de atraso.\par
+\par
+\cf0\b0 Companhia Mais Pontual: \par
+\cf1\b Determina a companhia a\'e9rea com a maior taxa de pontualidade.\par
+top 10 de companhias\par
+\par
+\cf0\b0\fs32 Visualiza\'e7\'f5es e gr\'e1ficos:\par
+\cf1\b\fs28\par
+\cf0\b0 Gr\'e1fico de Barras de Situa\'e7\'e3o de Voo: \cf1\b Um gr\'e1fico de barras que mostra a distribui\'e7\'e3o dos voos por diferentes situa\'e7\'f5es (em tempo, atrasado, cancelado, etc.).\par
+\par
+\cf0\b0 Gr\'e1fico de Linhas de Pontualidade ao Longo do Tempo: \cf1\b Um gr\'e1fico de linhas que mostra a varia\'e7\'e3o da taxa de pontualidade ao longo dos meses/anos.\par
+\par
+\cf0\b0 Mapa de Rotas Populares: \cf1\b Um mapa que exibe as rotas mais populares com espessura das linhas representando a quantidade de voos e cores representando as companhias a\'e9reas.\par
+\par
+\cf0\b0 Gr\'e1fico de Bolhas de Aeroportos: \cf1\b Um gr\'e1fico de bolhas que compara os aeroportos com base na taxa de pontualidade versus a quantidade de voos.\par
+\par
+\cf0\b0 Gr\'e1fico de Setores de Motivos de Atraso: \cf1\b Um gr\'e1fico de setores que mostra a distribui\'e7\'e3o dos diferentes motivos de atraso.\par
+\cf0\b0\par
+Mapa de Calor de Atrasos por Hora: \cf1\b Um mapa de calor que destaca os hor\'e1rios do dia com maior incid\'eancia de atrasos.\par
+\par
+------------------------------------------------------------------------------------------------\par
+\par
+\cf0 FORMULAS DAX USADAS\par
+\b0 calendarflightdax = \par
+ADDCOLUMNS(\par
+     CALENDARAUTO(),\b\par
+     "Ano", \b0 YEAR([Date]),\b\par
+     "M\'caS", \b0 MONTH([Date]),\par
+     \b "NOME DO M\'caS\b0 ", FORMAT([Date], "MMM"),\par
+     \b "DIA DA SEMANA", \b0 FORMAT([Date], "dddd"),\b\par
+     "trimentre", \b0 "T" & QUARTER([Date])\par
+)\par
+\par
+CALCULOS DE ATRASOS EM DAX\par
+\b voos de partida\par
+\b0 Voos partida Em Atraso = \par
+CALCULATE(\par
+    COUNTROWS('FlightBrazil'),\par
+    'FlightBrazil'[Situacao.Voo] <> "Cancelado" && \par
+    'FlightBrazil'[Partida.Real] - 'FlightBrazil'[Partida.Prevista] > TIME(0, 35, 0)\par
+)\par
+\b VOOS DE CHEGADA\par
+\b0 Voos chegada Em Atraso = \par
+CALCULATE(\par
+    COUNTROWS('FlightBrazil'),\par
+    'FlightBrazil'[Situacao.Voo] <> "Cancelado" && \par
+    'FlightBrazil'[Chegada.Real] - 'FlightBrazil'[Chegada.Prevista] > TIME(0, 35, 0)\par
+)\par
+\b MINUTOS TOTAIS DE ATRASO\par
+\b0 minutos atrasos em partidas = \par
+CALCULATE(\par
+    SUMX(\par
+        'FlightBrazil',\par
+        IF(\par
+            'FlightBrazil'[Situacao.Voo] = "Realizado" &&\par
+            'FlightBrazil'[Partida.Real] > 'FlightBrazil'[Partida.Prevista],\par
+            'FlightBrazil'[Partida.Real] - 'FlightBrazil'[Partida.Prevista]\par
+        )\par
+    ),\par
+    'FlightBrazil'[Situacao.Voo] = "Realizado"\par
+)\par
+\b MEDIA DE ATRASO EM PARTIDAS\par
+\b0 M\'e9dia de Atrasos em partidas = \par
+DIVIDE(\par
+    [minutos atrasos em partidas],\par
+    CALCULATE(\par
+        COUNTROWS('FlightBrazil'),\par
+        'FlightBrazil'[Situacao.Voo] = "Realizado"\par
+    ),\par
+    0\par
+)\par
+\b TEMPO M\'c9DIO DE ATRASO POR ROTA\par
+\b0 Tempo M\'e9dio de Atraso por Rota = \par
+VAR Atrasos =\par
+    FILTER(\par
+        'FlightBrazil',\par
+        'FlightBrazil'[Situacao.Voo] = "Realizado" &&\par
+        'FlightBrazil'[Partida.Real] > 'FlightBrazil'[Partida.Prevista]\par
+    )\par
+RETURN\par
+    SUMX(\par
+        SUMMARIZE(\par
+            Atrasos,\par
+            'FlightBrazil'[Aeroporto.Origem],\par
+            'FlightBrazil'[Aeroporto.Destino],\par
+            "Total Minutos de Atraso",\par
+            'medidas'[Voos partida Em Tempo] - 'medidas'[Voos chegada Em Tempo]\par
+        ),\par
+        [Total Minutos de Atraso]\par
+    )\par
+    / COUNTROWS(Atrasos)\par
+\cf1\par
+\cf0\b PERCENTUAIS DE VOOS CANCELADOS\par
+\b0 % de Voos Cancelados = \par
+DIVIDE(\par
+    CALCULATE(\par
+        COUNTROWS('FlightBrazil'),\par
+        'FlightBrazil'[Situacao.Voo] = "Cancelado"\par
+    ),\par
+    COUNTROWS('FlightBrazil')\par
+)\par
+\par
+\b porcentagem de voos Em tempo dax\par
+\b0 Porcentagem de Voos Em Tempo = \par
+DIVIDE(\par
+    CALCULATE(\par
+        COUNTROWS('FlightBrazil'),\par
+        'FlightBrazil'[Situacao.Voo] = "Realizado" && \par
+        'FlightBrazil'[Partida.Real] - 'FlightBrazil'[Partida.Prevista] <= TIME(0, 0, 0) && \par
+        'FlightBrazil'[Chegada.Real] - 'FlightBrazil'[Chegada.Prevista] <= TIME(0, 0, 0)\par
+    ),\par
+    COUNTROWS('FlightBrazil'),\par
+    0\par
+)\par
+\b TOTAIS DE VOOS CANCELADOS\par
+\b0 Voos Cancelados = \par
+CALCULATE(\par
+    COUNTROWS('FlightBrazil'),\par
+    'FlightBrazil'[Situacao.Voo] = "Cancelado"\par
+)\par
+\b VOOS REALIZADOS\par
+\b0 Voos Realizado = \par
+CALCULATE(\par
+    COUNTROWS('FlightBrazil'),\par
+    'FlightBrazil'[Situacao.Voo]= "Realizado" \par
+)\par
+\par
+\par
+An\'e1lise de problemas encontrados\par
+\par
+entre os anos 2015 a 2017 tivemos um numeros alto de voos realizados\par
+uma taxa de propor\'e7\'e3o menor para voos cancelados e em atraso.\par
+\par
+Os aeroportos com maiores picos de Realizados e cancelados s\'e3o\par
+Guarulhos\par
+presidente jucelino Kubitschek\par
+Congonhas\par
+Gale\'e3o\par
+tivemos um pico maior de voos com chegada em tempo no ano de 2015 e uma queda em 2016.\par
+e para voos com chegadas em atraso um aumento em 2016 e queda em 2017.\par
+que os aeroporto de Guarulhos e Jucelino Kubitischeck bate recordes de voos no Brasil entre Partidas e Atrasos. 73% de voos em tempo e 0,9% em voos cancelados.\par
+quanto as companhias aereas podemos ver que em um ranking de top 10.\par
+as mais pontuais s\'e3o as companhias internacionais\par
+1- copa-companhia panama\par
+2- aerolineas argentina\par
+3-Map linha aereas\par
+4-TAP AIR Portugal\par
+5- TAM-LATAM\par
+\par
+tambem observamos as top companhias de voos cancelados taxa de percentual total fi de 0,11%\par
+1- GOL\par
+2-TAM\par
+3-PASSAREDO\par
+4-AVIANCA BRASIL\par
+5-TAP AIR PORTUGAL\par
+outra metrica relevante s\'e3o os voos com partidas em atraso\par
+1-TAM\par
+2-AZUL\par
+3-GOL\par
+4-AVIANCA BRASIL\par
+5-PASSAREDO\par
+com diversar crises no setor aereo nacional podemos destacar que as partidas em tempo vem diminuindo a cada ano dentre o per\'eddo estudado e o tempo de atrasos tambem apresenta uma aumento.\par
+segundo a veja em 2015 tivemos os seguintes dados na avia\'e7\'e3o nacional\par
+Os custos aumentaram em 24% em 2015, enquanto as receitas subiram apenas 3,7%. Isso pelos aumentos de custos externos com aeronaves.\par
+Em 2016  mercado dom\'e9stico encolheu 5,5% segundo a (ABEAR) com baixa demanda de passageiros\par
+Em 2017 tivemos um crescimento aparente de 7,6% se comparado a 2016\par
+Bem dentre essas crises podemos perceber algumas anomalias encontradas nos gr\'e1fico dentre os voos nacionais com chegada e destinos interenacionais.\par
+O setor avia\'e7\'e3o tem um mercado representativo na logistica do Brasil. Mesmo com adversidade pode driblar a crise e crescer mediante aos proximos anos.\par
+\par
+\cf1\b\par
+\par
+\par
+\par
+\par
+\par
+\par
+\fs32\par
+\cf0\b0\fs22\par
+\par
+}
+ 
